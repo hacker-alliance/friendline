@@ -1,4 +1,5 @@
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
+const querystring = require('querystring');
 
 let response;
 
@@ -16,7 +17,18 @@ let response;
  */
 exports.lambdaHandler = async (event, context) => {
     const twiml = new VoiceResponse();
-    twiml.say({ voice: 'alice' }, 'Hello, Welcome to Friendline!');
+    twiml.say({ voice: 'alice' }, 'Hello, Welcome to friend line!');
+    twiml.say({ voice: 'alice' }, 'We\'ll be pairing you with a friend shortly, here\'s some music while you wait');
+
+    const dial = twiml.dial();
+    const waitMusicBucket = 'com.twilio.music.classical';
+    const waitMessage = 'Thank you for waiting. We\'ll be pairing you with a friend shortly.';
+
+    // TODO - Route based on detected City or IVR Input
+    dial.conference({
+        waitUrl: 'http://twimlets.com/holdmusic?Bucket=' + waitMusicBucket + '&amp;Message=' + querystring.escape(waitMessage),
+        beep: false
+    }, 'NYC-Room');
 
     try {
         response = {
@@ -28,6 +40,5 @@ exports.lambdaHandler = async (event, context) => {
         console.log(err);
         return err;
     }
-
     return response
 };
