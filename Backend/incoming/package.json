@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.643.0",
     "twilio": "^3.41.1"
   }
 }

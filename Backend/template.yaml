@@ -21,12 +21,26 @@ Resources:
           Properties:
             Path: /hello
             Method: get
+  QueueTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions:
+        - AttributeName: QUEUE_ID
+          AttributeType: "N"
+      KeySchema: 
+        - AttributeName: QUEUE_ID
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: "QueueTable"
   IncomingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: incoming/
       Handler: app.lambdaHandler
       Runtime: nodejs12.x
+      Policies: AmazonDynamoDBFullAccess
       Events:
         VoiceIncoming:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api

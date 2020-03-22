@@ -1,6 +1,29 @@
+// Import AWS Node.js SDK
+const AWS = require('aws-sdk');
+
+// Set Region to us-east-1
+AWS.config.update({ region: 'us-east-1' });
+
+const DynamoDB = new AWS.DynamoDB();
+
 const VoiceResponse = require('twilio').twiml.VoiceResponse;
 
 let response;
+
+const updateParams = {
+    Key: {
+        QUEUE_ID: { N: '001' },
+    },
+    ExpressionAttributeNames: {
+        "#C": "Caller_ID"
+    },
+    ExpressionAttributeValues: {
+        ":incr": { "N": "1" }
+    },
+    ReturnValues: "ALL_NEW",
+    TableName: "QueueTable",
+    UpdateExpression: "SET #C = #C + :incr"
+};
 
 /**
  *
@@ -18,20 +41,20 @@ exports.lambdaHandler = async (event, context) => {
     const twiml = new VoiceResponse();
     twiml.say({ voice: 'alice' }, 'Hello, Welcome to neighbor line!');
 
-    // twiml.say({ voice: 'alice' }, 'I see you are calling from ');
-    console.log(event.body);
-
     twiml.say({ voice: 'alice' }, 'We\'ll be pairing you with a neighbor shortly, here\'s some music while you wait');
 
-    const dial = twiml.dial();
-    const waitMusicBucket = 'com.twilio.music.classical';
-    const waitMessage = 'Thank you for waiting. We\'ll be pairing you with a friend shortly.';
+    let item = await DynamoDB.updateItem(updateParams).promise();
+    console.log(item);
+    let caller_ID = item.Attributes.Caller_ID.N;
 
-    // TODO - Route based on detected City or IVR Input
+    const dial = twiml.dial();
+
+    let room_ID = (caller_ID % 2 == 0) ? caller_ID - 1 : caller_ID;
+
     dial.conference({
         waitUrl: 'https://api.neighborline.hackeralliance.org/wait/music',
         beep: true
-    }, 'NYC-Room');
+    }, 'Pair_Room_' + room_ID);
 
     try {
         response = {
