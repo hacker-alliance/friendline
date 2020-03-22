@@ -18,7 +18,7 @@ exports.lambdaHandler = async (event, context) => {
     const twiml = new VoiceResponse();
 
     twiml.play('http://demo.twilio.com/docs/classic.mp3');
-    twiml.say({ voice: 'alice' }, 'Thank you for waiting. We\'ll be pairing you with a friend shortly.');
+    twiml.say({ voice: 'alice' }, 'Thank you for waiting. We\'ll be pairing you with a neighbor shortly.');
     twiml.redirect();
 
     try {

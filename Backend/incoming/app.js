@@ -16,12 +16,12 @@ let response;
  */
 exports.lambdaHandler = async (event, context) => {
     const twiml = new VoiceResponse();
-    twiml.say({ voice: 'alice' }, 'Hello, Welcome to friend line!');
+    twiml.say({ voice: 'alice' }, 'Hello, Welcome to neighbor line!');
 
     // twiml.say({ voice: 'alice' }, 'I see you are calling from ');
     console.log(event.body);
 
-    twiml.say({ voice: 'alice' }, 'We\'ll be pairing you with a friend shortly, here\'s some music while you wait');
+    twiml.say({ voice: 'alice' }, 'We\'ll be pairing you with a neighbor shortly, here\'s some music while you wait');
 
     const dial = twiml.dial();
     const waitMusicBucket = 'com.twilio.music.classical';
@@ -29,7 +29,7 @@ exports.lambdaHandler = async (event, context) => {
 
     // TODO - Route based on detected City or IVR Input
     dial.conference({
-        waitUrl: 'https://api.friendline.hackeralliance.org/wait/music',
+        waitUrl: 'https://api.neighborline.hackeralliance.org/wait/music',
         beep: true
     }, 'NYC-Room');
 
