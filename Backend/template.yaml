@@ -40,7 +40,6 @@ Resources:
       CodeUri: incoming/
       Handler: app.lambdaHandler
       Runtime: nodejs12.x
-      Policies: AmazonDynamoDBFullAccess
       Events:
         VoiceIncoming:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
@@ -58,6 +57,19 @@ Resources:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /wait/music
+            Method: post
+  QueueFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: queue/
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+      Policies: AmazonDynamoDBFullAccess
+      Events:
+        VoiceIncoming:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /queue
             Method: post
 
 Outputs:

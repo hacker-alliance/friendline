@@ -1,5 +1,5 @@
 {
-  "name": "incoming",
+  "name": "queue",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.647.0",
     "twilio": "^3.41.1"
   }
 }
