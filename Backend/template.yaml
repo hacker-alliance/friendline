@@ -25,15 +25,15 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties: 
       AttributeDefinitions:
-        - AttributeName: QUEUE_ID
-          AttributeType: "N"
+        - AttributeName: CALL_QUEUE_ID
+          AttributeType: "S"
       KeySchema: 
-        - AttributeName: QUEUE_ID
+        - AttributeName: CALL_QUEUE_ID
           KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-      TableName: "QueueTable"
+      TableName: "CallQueueTable"
   IncomingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
