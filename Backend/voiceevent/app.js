@@ -9,44 +9,27 @@ const DynamoDB = new AWS.DynamoDB();
 
 let response;
 
-async function anonymize(called) {
+async function decrementQueue(called) {
   const updateParams = {
     Key: {
       CALLED_ID: { S: `Queue${called}` },
     },
     ExpressionAttributeNames: {
-      '#C': 'CALLER_ID',
+      '#C': 'QUEUE_LENGTH',
     },
     ExpressionAttributeValues: {
-      ':incr': { N: '1' },
+      ':decr': { N: '1' },
     },
     ReturnValues: 'ALL_NEW',
     TableName: 'QueueTable',
-    UpdateExpression: 'SET #C = #C + :incr',
+    UpdateExpression: 'SET #C = #C - :decr',
   };
 
   const item = await DynamoDB.updateItem(updateParams).promise();
   console.log(item);
 
-  return item.Attributes.CALLER_ID.N;
+  return item.Attributes.QUEUE_LENGTH.N;
 }
-
-async function findRoom(called, callerID) {
-  const roomID = (callerID % 2 === 0) ? callerID - 1 : callerID;
-
-  const twiml = new VoiceResponse();
-  const dial = twiml.dial();
-
-  dial.conference({
-    waitUrl: 'https://api.neighborline.hackeralliance.org/wait/music',
-    beep: true,
-    endConferenceOnExit: true,
-    maxParticipants: 2,
-  }, `Queue${called}_Room_${roomID}`);
-
-  return twiml;
-}
-
 /**
  *
  * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
@@ -66,8 +49,9 @@ exports.lambdaHandler = async (event, context) => {
   const params = querystring.parse(event.body);
   console.log(params);
 
-  const callerID = anonymize(params.called);
-  const twiml = await findRoom(params.called, callerID);
+  if (params.QueueResult !== 'bridged' || params.QueueResult !== 'bridging-in-process') {
+    await decrementQueue(params.Called);
+  }
 
   try {
     response = {

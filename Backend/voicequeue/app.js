@@ -34,18 +34,81 @@ async function anonymize(called) {
   return item.Attributes.CALLER_ID.N;
 }
 
-async function findRoom(called, callerID) {
-  const roomID = (callerID % 2 === 0) ? callerID - 1 : callerID;
+async function getQueueLength(called) {
+  const getParams = {
+    Key: {
+      CALLED_ID: { S: `Queue${called}` },
+    },
+    ConsistentRead: true,
+    TableName: 'QueueTable',
+  };
+
+  const item = await DynamoDB.getItem(getParams).promise();
+  console.log(item);
+
+  return item.Item.QUEUE_LENGTH.N;
+}
+
+async function incrementQueue(called, amount) {
+  const updateParams = {
+    Key: {
+      CALLED_ID: { S: `Queue${called}` },
+    },
+    ExpressionAttributeNames: {
+      '#C': 'QUEUE_LENGTH',
+    },
+    ExpressionAttributeValues: {
+      ':incr': { N: `${amount}` },
+    },
+    ReturnValues: 'ALL_NEW',
+    TableName: 'QueueTable',
+    UpdateExpression: 'SET #C = #C + :incr',
+  };
+
+  const item = await DynamoDB.updateItem(updateParams).promise();
+  console.log(item);
+
+  return item.Attributes.QUEUE_LENGTH.N;
+}
+
+function enqueue(called, twiml) {
+  twiml.enqueue({
+    action: '/voice/event',
+    method: 'POST',
+    waitUrl: 'https://api.neighborline.hackeralliance.org/voice/wait',
+  }, `Queue${called}`);
+}
+
+function dequeue(called, twiml) {
+  const dial = twiml.dial();
+  dial.queue({
+    // TODO: Implement Connection Notification using url
+  }, `Queue${called}`);
+}
+async function findNeighbor(called, callerID) {
+  console.log(`Handling Caller #${callerID} to ${called}`);
 
   const twiml = new VoiceResponse();
-  const dial = twiml.dial();
 
-  dial.conference({
-    waitUrl: 'https://api.neighborline.hackeralliance.org/voice/wait',
-    beep: true,
-    endConferenceOnExit: true,
-    maxParticipants: 2,
-  }, `Queue${called}_Room_${roomID}`);
+  let queueLength = await getQueueLength(called);
+  // Check how many callers are available in queue
+  if (queueLength > 0) {
+    // Attempt to dequeue
+    queueLength = await incrementQueue(called, -1);
+    if (queueLength < 0) {
+      // Negative value means another lambda already took our caller, fix queue length and enqueue
+      queueLength = await incrementQueue(called, 2);
+      enqueue(called, twiml);
+    } else {
+      // Positive value or zero means we're good to go, dial into queue
+      dequeue(called, twiml);
+    }
+  } else {
+    // Queue is empty, increment queue and enqueue
+    queueLength = await incrementQueue(called, 1);
+    enqueue(called, twiml);
+  }
+  console.log(queueLength);
 
   return twiml;
 }
@@ -70,7 +133,7 @@ exports.lambdaHandler = async (event, context) => {
   console.log(params);
 
   const callerID = await anonymize(params.Called);
-  const twiml = await findRoom(params.Called, callerID);
+  const twiml = await findNeighbor(params.Called, callerID);
 
   try {
     response = {

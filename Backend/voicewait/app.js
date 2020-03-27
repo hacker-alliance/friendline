@@ -22,6 +22,7 @@ exports.lambdaHandler = async (event, context) => {
   twiml.say({ voice: 'alice' }, 'Here is some music while you wait.');
   twiml.play('http://demo.twilio.com/docs/classic.mp3');
   twiml.say({ voice: 'alice' }, 'Thank you for waiting. Unfortunately, we were unable to match you with a neighbor. Please call back at another time. Goodbye.');
+  twiml.hangup();
 
   try {
     response = {
