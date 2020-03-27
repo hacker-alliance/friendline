@@ -1,5 +1,5 @@
 {
-  "name": "incoming",
+  "name": "voiceevent",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "twilio": "^3.41.1"
+    "aws-sdk": "^2.647.0"
   }
 }

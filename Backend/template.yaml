@@ -25,43 +25,43 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties: 
       AttributeDefinitions:
-        - AttributeName: CALL_QUEUE_ID
+        - AttributeName: CALLED_ID
           AttributeType: "S"
       KeySchema: 
-        - AttributeName: CALL_QUEUE_ID
+        - AttributeName: CALLED_ID
           KeyType: HASH
       ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
-      TableName: "CallQueueTable"
-  IncomingFunction:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: "QueueTable"
+  VoiceIncomingFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: incoming/
+      CodeUri: voiceincoming/
       Handler: app.lambdaHandler
       Runtime: nodejs12.x
       Events:
         VoiceIncoming:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /incoming/voice
+            Path: /voice/incoming
             Method: post
-  WaitMusicFunction:
+  VoiceWaitFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: wait/
+      CodeUri: voicewait/
       Handler: app.lambdaHandler
       Runtime: nodejs12.x
       Events:
         VoiceIncoming:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /wait/music
+            Path: /voice/wait
             Method: post
-  QueueFunction:
+  VoiceQueueFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: queue/
+      CodeUri: voicequeue/
       Handler: app.lambdaHandler
       Runtime: nodejs12.x
       Policies: AmazonDynamoDBFullAccess
@@ -69,7 +69,20 @@ Resources:
         VoiceIncoming:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /queue
+            Path: /voice/queue
+            Method: post
+  VoiceEventFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: voiceevent/
+      Handler: app.lambdaHandler
+      Runtime: nodejs12.x
+      Policies: AmazonDynamoDBFullAccess
+      Events:
+        VoiceIncoming:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /voice/event
             Method: post
 
 Outputs:

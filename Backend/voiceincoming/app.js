@@ -19,9 +19,10 @@ exports.lambdaHandler = async (event, context) => {
   console.log(event);
   console.log(context);
 
+
   const twiml = new VoiceResponse();
   twiml.say({ voice: 'alice' }, 'Hello, welcome to neighbor line! We\'ll be pairing you with a neighbor shortly. You\'ll hear a beep when you are connected.');
-  twiml.redirect({ method: 'POST' }, '/queue');
+  twiml.redirect({ method: 'POST' }, '/voice/queue');
 
   try {
     response = {
