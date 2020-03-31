@@ -49,7 +49,7 @@ exports.lambdaHandler = async (event, context) => {
   const params = querystring.parse(event.body);
   console.log(params);
 
-  if (params.QueueResult !== 'bridged' || params.QueueResult !== 'bridging-in-process') {
+  if (params.QueueResult !== 'bridged' && params.QueueResult !== 'bridging-in-process') {
     await decrementQueue(params.Called);
   }
 
