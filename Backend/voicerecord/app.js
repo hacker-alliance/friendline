@@ -18,15 +18,19 @@ const voiceParams = {
   language: 'en',
 };
 
-
 exports.lambdaHandler = async (event, context) => {
   console.log(event);
   console.log(context);
 
   const twiml = new VoiceResponse();
-  twiml.say(voiceParams, 'Here is some music while you wait.');
-  twiml.play('http://demo.twilio.com/docs/classic.mp3');
-  twiml.say(voiceParams, 'Thank you for waiting. Unfortunately, we were unable to match you with a neighbor. Please call back at another time. Goodbye.');
+  twiml.say(voiceParams, 'Please leave a message after the beep, hangup when finished.');
+  twiml.record({
+    timeout: 300,
+    transcribe: false,
+    trim: 'trim-silence',
+    finishOnKey: '',
+  });
+  twiml.say(voiceParams, 'Thank you for your feedback. Goodbye.');
   twiml.hangup();
 
   try {

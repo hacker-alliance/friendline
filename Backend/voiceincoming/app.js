@@ -15,13 +15,26 @@ let response;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
+const voiceParams = {
+  language: 'en',
+};
+
 exports.lambdaHandler = async (event, context) => {
   console.log(event);
   console.log(context);
 
 
   const twiml = new VoiceResponse();
-  twiml.say({ voice: 'alice' }, 'Hello, welcome to neighbor line! We\'ll be pairing you with a neighbor shortly.');
+  twiml.say(voiceParams, 'Hello, welcome to neighbor line!');
+  const gather = twiml.gather({
+    input: 'dtmf',
+    numDigits: '1',
+    timeout: '3',
+    action: '/voice/record',
+    method: 'POST',
+  });
+  gather.say(voiceParams, 'If you would like to leave a message, press any key, otherwise stay on the line.');
+  twiml.say(voiceParams, 'We\'ll be pairing you with a neighbor shortly.');
   twiml.redirect({ method: 'POST' }, '/voice/queue');
 
   try {
