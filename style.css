@@ -17,7 +17,7 @@ body{
     background-color: #094CFC;
     color: white;
     cursor: pointer;
-    padding: 15px;
+    padding: 10px;
     border-radius: 4px;
 }
 #myBtn:hover {
