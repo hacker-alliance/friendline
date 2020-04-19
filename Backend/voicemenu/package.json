@@ -1,6 +1,7 @@
 {
-  "name": "voicequeue",
+  "name": "voicemenu",
   "version": "1.0.0",
+  "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -8,9 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.647.0",
     "twilio": "^3.42.2"
-  },
-  "devDependencies": {},
-  "description": ""
+  }
 }
