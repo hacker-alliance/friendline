@@ -14,23 +14,19 @@ let response;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-const voiceParams = {
-  language: 'en',
-};
 
 exports.lambdaHandler = async (event, context) => {
   console.log(event);
   console.log(context);
 
   const twiml = new VoiceResponse();
-  twiml.say(voiceParams, 'Please leave a message after the beep, hangup when finished.');
+  twiml.play('https://neighborline-public.s3.amazonaws.com/audio/After2.wav');
   twiml.record({
     timeout: 300,
     transcribe: false,
     trim: 'trim-silence',
     finishOnKey: '',
   });
-  twiml.say(voiceParams, 'Thank you for your feedback. Goodbye.');
   twiml.hangup();
 
   try {

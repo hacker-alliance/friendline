@@ -15,9 +15,6 @@ let response;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-const voiceParams = {
-  language: 'en',
-};
 
 exports.lambdaHandler = async (event, context) => {
   console.log(event);
@@ -25,8 +22,7 @@ exports.lambdaHandler = async (event, context) => {
 
 
   const twiml = new VoiceResponse();
-  twiml.say(voiceParams, 'Hello, welcome to neighbor line!');
-  // TODO: Consider implementing community guidelines for first time calling in
+  twiml.play('https://neighborline-public.s3.amazonaws.com/audio/Welcome.wav');
   twiml.redirect({ method: 'POST' }, '/voice/menu');
 
   try {

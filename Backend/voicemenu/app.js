@@ -16,9 +16,6 @@ let response;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
  */
-const voiceParams = {
-  language: 'en',
-};
 
 exports.lambdaHandler = async (event, context) => {
   console.log(event);
@@ -30,21 +27,20 @@ exports.lambdaHandler = async (event, context) => {
   const twiml = new VoiceResponse();
   switch (params.Digits) {
     case '1':
-      twiml.say(voiceParams, 'We\'ll be pairing you with a neighbor shortly.');
+      twiml.play('https://neighborline-public.s3.amazonaws.com/audio/After1.wav');
       twiml.redirect({ method: 'POST' }, '/voice/queue');
       break;
     case '2':
       twiml.redirect({ method: 'POST' }, '/voice/record');
       break;
     default:
-      twiml.say(voiceParams, 'You must accept the community guidelines to use neighborline.');
       twiml.gather({
         input: 'dtmf',
         numDigits: '1',
         timeout: '5',
         action: '/voice/menu',
         method: 'POST',
-      }).say(voiceParams, 'If you agree to the community guidelines, press 1 to be paired with a neighbor. If you would like to report an incident or leave feedback, press 2 to record a message.');
+      }).play('https://neighborline-public.s3.amazonaws.com/audio/Guidelines.wav');
       twiml.redirect();
   }
   try {
