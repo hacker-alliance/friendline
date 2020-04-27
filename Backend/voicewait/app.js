@@ -15,12 +15,23 @@ let response;
  *
  */
 
+function randomChoice(choices) {
+  const i = Math.floor(Math.random() * Math.floor(choices.length));
+  return choices[i];
+}
+
 exports.lambdaHandler = async (event, context) => {
   console.log(event);
   console.log(context);
 
   const twiml = new VoiceResponse();
-  twiml.play('http://demo.twilio.com/docs/classic.mp3');
+
+  const choices = [
+    'http://com.twilio.music.classical.s3.amazonaws.com/ith_brahms-116-4.mp3',
+    'http://com.twilio.music.classical.s3.amazonaws.com/ith_chopin-15-2.mp3',
+  ];
+
+  twiml.play(randomChoice(choices));
   twiml.hangup();
 
   try {
