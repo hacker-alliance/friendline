@@ -5,6 +5,9 @@ const querystring = require('querystring');
 // Set Region to us-east-1
 AWS.config.update({ region: 'us-east-1' });
 
+// Import Twilio
+const { VoiceResponse } = require('twilio').twiml;
+
 const DynamoDB = new AWS.DynamoDB();
 
 let response;
@@ -52,12 +55,13 @@ exports.lambdaHandler = async (event, context) => {
   if (params.QueueResult !== 'bridged' && params.QueueResult !== 'bridging-in-process') {
     await decrementQueue(params.Called);
   }
-
+  const twiml = new VoiceResponse();
+  twiml.hangup();
   try {
     response = {
       statusCode: 200,
       headers: { 'content-type': 'text/xml' },
-      body: 'OK',
+      body: twiml.toString(),
     };
   } catch (err) {
     console.log(err);
